@@ -34,33 +34,28 @@ public class MealEntity extends AbstractBaseEntity {
     @OrderBy("position")
     private List<StepEntity> steps;
 
-    @Transient
     private double calorific;
-    @Transient
     private double protein;
-    @Transient
     private double fat;
-    @Transient
     private double carbohydrates;
-    @Transient
     private double roughage;
 
-    @PostLoad
+    @PrePersist
     void init() {
-        for (MealProductEntity product : products) {
-            double amountFactor = product.getAmount() / 100.0;
-            calorific += product.getProduct().getCalorific() * amountFactor;
-            protein += product.getProduct().getProtein() * amountFactor;
-            fat += product.getProduct().getFat() * amountFactor;
-            carbohydrates += product.getProduct().getCarbohydrates() * amountFactor;
-            roughage += product.getProduct().getRoughage() * amountFactor;
+        if(!products.isEmpty()) {
+            for (MealProductEntity product : products) {
+                double amountFactor = product.getAmount() / 100.0;
+                calorific += product.getProduct().getCalorific() * amountFactor;
+                protein += product.getProduct().getProtein() * amountFactor;
+                fat += product.getProduct().getFat() * amountFactor;
+                carbohydrates += product.getProduct().getCarbohydrates() * amountFactor;
+                roughage += product.getProduct().getRoughage() * amountFactor;
+            }
+            calorific = new BigDecimal(calorific).setScale(1, RoundingMode.HALF_UP).doubleValue();
+            protein = new BigDecimal(protein).setScale(1, RoundingMode.HALF_UP).doubleValue();
+            fat = new BigDecimal(fat).setScale(1, RoundingMode.HALF_UP).doubleValue();
+            carbohydrates = new BigDecimal(carbohydrates).setScale(1, RoundingMode.HALF_UP).doubleValue();
+            roughage = new BigDecimal(roughage).setScale(1, RoundingMode.HALF_UP).doubleValue();
         }
-
-        calorific = new BigDecimal(calorific).setScale(1, RoundingMode.HALF_UP).doubleValue();
-        protein = new BigDecimal(protein).setScale(1, RoundingMode.HALF_UP).doubleValue();
-        fat = new BigDecimal(fat).setScale(1, RoundingMode.HALF_UP).doubleValue();
-        carbohydrates = new BigDecimal(carbohydrates).setScale(1, RoundingMode.HALF_UP).doubleValue();
-        roughage = new BigDecimal(roughage).setScale(1, RoundingMode.HALF_UP).doubleValue();
     }
-
  }
